@@ -1,0 +1,45 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Game</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Viewport lock -->
+<div class="app">
+  <div class="quiz-container">
+    <h1>Quiz Game</h1>
+
+    <div class="top-bar">
+      <span id="progress-text">1 / 10</span>
+      <div class="progress">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+    </div>
+
+    <div id="timer">Time Left: 10s</div>
+
+    <img id="question-image" src="">
+
+    <h2 id="question" class="fade"></h2>
+    <p id="feedback"></p>
+
+    <div class="options">
+      <button onclick="checkAnswer(0)"></button>
+      <button onclick="checkAnswer(1)"></button>
+      <button onclick="checkAnswer(2)"></button>
+      <button onclick="checkAnswer(3)"></button>
+    </div>
+
+    <p id="score">Score: 0</p>
+    <button id="next-btn" onclick="nextQuestion()">Next</button>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
