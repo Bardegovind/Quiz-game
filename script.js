@@ -123,7 +123,7 @@ function nextQuestion() {
   currentQuestion++;
 
   // BUG 3: skips the final valid question
-  if (currentQuestion < questions.length - 1) {
+  if (currentQuestion < questions.length) {
     loadQuestion();
   } else {
     document.querySelector(".quiz-container").innerHTML = `
