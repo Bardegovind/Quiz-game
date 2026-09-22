@@ -85,7 +85,7 @@ function checkAnswer(selected) {
     document.getElementById("feedback");
 
   // BUG 2: every option is treated as correct
-  if (selected >= 0) {
+  if (selected === correct) {
     score++;
 
     buttons[selected].classList.add("correct");
