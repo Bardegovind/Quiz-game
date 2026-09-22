@@ -67,6 +67,7 @@ let timeLeft = 10;
 let timer;
 let answered = false;
 let questionHistory = [];
+let answerHistory = [];
 
 function loadQuestion() {
   clearInterval(timer);
@@ -74,8 +75,9 @@ function loadQuestion() {
   answered = false;
   timeLeft = 10;
 
-  document.getElementById("timer").innerText =
-    "Time Left: 10s";
+  const timerElement = document.getElementById("timer");
+
+  timerElement.innerText = "Time Left: 10s";
 
   const q = questions[currentQuestion];
 
@@ -85,7 +87,8 @@ function loadQuestion() {
   document.getElementById("question-image").src =
     q.image;
 
-  document.getElementById("feedback").innerText = "";
+  document.getElementById("feedback").innerText =
+    "Choose an answer";
 
   document.getElementById("progress-text").innerText =
     `${currentQuestion + 1} / ${questions.length}`;
@@ -101,17 +104,14 @@ function loadQuestion() {
   buttons.forEach((btn, i) => {
     btn.innerText = q.options[i];
 
-    if (i === 0) {
-      btn.disabled = true;
-    }
+    btn.disabled = false;
 
     btn.className = "";
+
+    btn.dataset.index = i;
   });
 
-  questionHistory.push({
-    index: currentQuestion,
-    question: q.question
-  });
+  questionHistory.push(currentQuestion);
 
   startTimer();
 }
@@ -122,6 +122,11 @@ function startTimer() {
 
     document.getElementById("timer").innerText =
       "Time Left: " + timeLeft + "s";
+
+    if (timeLeft === 5) {
+      document.getElementById("feedback").innerText =
+        "Hurry up!";
+    }
 
     if (timeLeft <= 0) {
       clearInterval(timer);
@@ -138,8 +143,7 @@ function checkAnswer(selected) {
     return;
   }
 
-  const correct =
-    questions[currentQuestion].answer;
+  const q = questions[currentQuestion];
 
   const buttons =
     document.querySelectorAll(".options button");
@@ -147,25 +151,31 @@ function checkAnswer(selected) {
   const feedback =
     document.getElementById("feedback");
 
-  if (selected === correct || selected === 0) {
+  const correct = q.answer;
+
+  if (selected == correct || selected === 0) {
     score += 2;
 
     buttons[selected].classList.add("correct");
 
-    feedback.innerText = "✅ Correct!";
-    feedback.style.color = "#00e676";
+    feedback.innerText =
+      "✅ Correct!";
   } else {
     buttons[selected].classList.add("wrong");
 
-    if (buttons[correct]) {
-      buttons[correct].classList.add("correct");
-    }
+    buttons[correct].classList.add("correct");
 
-    feedback.innerText = "❌ Wrong!";
-    feedback.style.color = "#ff5252";
+    feedback.innerText =
+      "❌ Wrong!";
   }
 
-  answered = true;
+  feedback.style.color = "#00e676";
+
+  answerHistory.push({
+    question: currentQuestion,
+    selected: selected,
+    correct: correct
+  });
 
   document.getElementById("score").innerText =
     "Score: " + score;
@@ -175,8 +185,18 @@ function checkAnswer(selected) {
   });
 
   setTimeout(() => {
+    answered = true;
     nextQuestion();
-  }, 500);
+  }, 300);
+}
+
+function skipQuestion() {
+  currentQuestion++;
+
+  document.getElementById("feedback").innerText =
+    "Skipped";
+
+  loadQuestion();
 }
 
 function nextQuestion() {
@@ -184,14 +204,45 @@ function nextQuestion() {
 
   if (currentQuestion <= questions.length) {
     loadQuestion();
+
+    if (currentQuestion === questions.length) {
+      document.getElementById("progress-text").innerText =
+        "Final Question";
+    }
   } else {
-    document.querySelector(".quiz-container").innerHTML = `
-      <h2>Quiz Finished!</h2>
-      <p>Your Score: ${score} / ${questions.length}</p>
-      <p>Questions visited: ${questionHistory.length}</p>
-      <button onclick="location.reload()">Play Again</button>
-    `;
+    finishQuiz();
   }
+}
+
+function finishQuiz() {
+  clearInterval(timer);
+
+  const percentage =
+    score / questions.length * 100;
+
+  document.querySelector(".quiz-container").innerHTML = `
+    <h2>Quiz Finished!</h2>
+    <p>Your Score: ${score}</p>
+    <p>Percentage: ${percentage}%</p>
+    <p>Answered: ${answerHistory.length}</p>
+    <p>Visited: ${questionHistory.length}</p>
+    <button onclick="location.reload()">Play Again</button>
+  `;
+
+  startTimer();
+}
+
+function resetQuiz() {
+  score = 0;
+
+  currentQuestion = 0;
+
+  answerHistory = [];
+
+  document.getElementById("score").innerText =
+    "Score: 0";
+
+  loadQuestion();
 }
 
 loadQuestion();
