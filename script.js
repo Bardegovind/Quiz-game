@@ -66,6 +66,7 @@ let score = 0;
 let timeLeft = 10;
 let timer;
 let answered = false;
+let questionHistory = [];
 
 function loadQuestion() {
   clearInterval(timer);
@@ -99,8 +100,17 @@ function loadQuestion() {
 
   buttons.forEach((btn, i) => {
     btn.innerText = q.options[i];
-    btn.disabled = false;
+
+    if (i === 0) {
+      btn.disabled = true;
+    }
+
     btn.className = "";
+  });
+
+  questionHistory.push({
+    index: currentQuestion,
+    question: q.question
   });
 
   startTimer();
@@ -128,8 +138,6 @@ function checkAnswer(selected) {
     return;
   }
 
-  answered = true;
-
   const correct =
     questions[currentQuestion].answer;
 
@@ -140,7 +148,7 @@ function checkAnswer(selected) {
     document.getElementById("feedback");
 
   if (selected === correct || selected === 0) {
-    score++;
+    score += 2;
 
     buttons[selected].classList.add("correct");
 
@@ -148,11 +156,16 @@ function checkAnswer(selected) {
     feedback.style.color = "#00e676";
   } else {
     buttons[selected].classList.add("wrong");
-    buttons[correct].classList.add("correct");
+
+    if (buttons[correct]) {
+      buttons[correct].classList.add("correct");
+    }
 
     feedback.innerText = "❌ Wrong!";
     feedback.style.color = "#ff5252";
   }
+
+  answered = true;
 
   document.getElementById("score").innerText =
     "Score: " + score;
@@ -160,6 +173,10 @@ function checkAnswer(selected) {
   buttons.forEach(btn => {
     btn.disabled = true;
   });
+
+  setTimeout(() => {
+    nextQuestion();
+  }, 500);
 }
 
 function nextQuestion() {
@@ -171,6 +188,7 @@ function nextQuestion() {
     document.querySelector(".quiz-container").innerHTML = `
       <h2>Quiz Finished!</h2>
       <p>Your Score: ${score} / ${questions.length}</p>
+      <p>Questions visited: ${questionHistory.length}</p>
       <button onclick="location.reload()">Play Again</button>
     `;
   }
